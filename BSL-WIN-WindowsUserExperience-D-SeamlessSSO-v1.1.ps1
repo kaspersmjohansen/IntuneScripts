@@ -15,6 +15,9 @@
 # File path
 $filePath = "C:\Windows\System32\IntegratedServicesRegionPolicySet.json"
 
+# Languages
+$Languages = "DK","SE","NO"
+
 # Ensure the script is run as Administrator
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Host "This script must be run as Administrator." -ForegroundColor Red
@@ -55,9 +58,13 @@ try {
 
     # Update the content: Remove "NL" from the "disabled" list under the specific GUID
     foreach ($policy in $jsonContent.policies) {
-        if ($policy.guid -eq "{1d290cdb-499c-4d42-938a-9b8dceffe998}") {
-            $policy.conditions.region.disabled = $policy.conditions.region.disabled | Where-Object { $_ -ne "NL" }
-            Write-Host "'NL' has been removed from the 'disabled' list for GUID: $($policy.guid)." -ForegroundColor Green
+        if ($policy.guid -eq "{1d290cdb-499c-4d42-938a-9b8dceffe998}") 
+        {
+            ForEach ($language in $languages)
+            {
+            $policy.conditions.region.disabled = $policy.conditions.region.disabled | Where-Object { $_ -ne "$language" }
+            Write-Host "'$language' has been removed from the 'disabled' list for GUID: $($policy.guid)." -ForegroundColor Green
+            }
         }
     }
 
